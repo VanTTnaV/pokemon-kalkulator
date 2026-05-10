@@ -48,7 +48,7 @@
   header {
     background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
     color: white;
-    padding: calc(env(safe-area-inset-top, 0px) + 40px) 16px 20px 16px;
+    padding: calc(env(safe-area-inset-top, 0px) + 20px) 16px 20px 16px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -231,7 +231,7 @@
     color: white;
     border-radius: 14px;
     padding: 18px 16px;
-    margin-top: 18px;
+    margin: 0 0 18px 0;
     text-align: center;
     box-shadow: var(--shadow-strong);
   }
@@ -553,6 +553,14 @@
   <section id="kalkulator">
     <h2><span class="icon">🎯</span> Kalkulator szans</h2>
 
+    <div class="result">
+      <div class="result-label">Twoja szansa</div>
+      <div class="result-value" id="resultValue">—</div>
+      <div class="result-sub" id="resultSub">na złapanie w jednym rzucie</div>
+      <div class="progress"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="multiplier-display" id="multDisplay">Łączny mnożnik: 1.00x</div>
+    </div>
+
     <div class="calc-row">
       <label for="pokemon">Pokémon</label>
       <select id="pokemon"></select>
@@ -601,14 +609,6 @@
         <button data-val="1.8">🥝 Silver Pinap</button>
         <button data-val="2.5">✨ Golden Razz</button>
       </div>
-    </div>
-
-    <div class="result">
-      <div class="result-label">Twoja szansa</div>
-      <div class="result-value" id="resultValue">—</div>
-      <div class="result-sub" id="resultSub">na złapanie w jednym rzucie</div>
-      <div class="progress"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-      <div class="multiplier-display" id="multDisplay">Łączny mnożnik: 1.00x</div>
     </div>
 
     <details>
