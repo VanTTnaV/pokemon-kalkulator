@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ee1515">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pokéball">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><circle cx='90' cy='90' r='86' fill='%23fff' stroke='%23222' stroke-width='8'/><path d='M4 90 A86 86 0 0 1 176 90 Z' fill='%23ee1515'/><rect x='4' y='84' width='172' height='12' fill='%23222'/><circle cx='90' cy='90' r='22' fill='%23fff' stroke='%23222' stroke-width='8'/><circle cx='90' cy='90' r='10' fill='%23fff' stroke='%23222' stroke-width='4'/></svg>">
+<title>Kalkulator Łapania Pokémonów</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #ee1515;
+    --red-dark: #b71c1c;
+    --yellow: #ffcb05;
+    --yellow-dark: #f4b400;
+    --blue: #3b4cca;
+    --bg: #fff8f0;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --text-soft: #555;
+    --border: #ececec;
+    --green: #4caf50;
+    --orange: #ff9800;
+    --shadow: 0 4px 14px rgba(0,0,0,0.08);
+    --shadow-strong: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(238,21,21,0.06) 0, transparent 40%),
+      radial-gradient(circle at 90% 30%, rgba(255,203,5,0.08) 0, transparent 40%);
+    color: var(--text);
+    line-height: 1.5;
+    font-size: 16px;
+    min-height: 100vh;
+    padding: 0 0 40px 0;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+    color: white;
+    padding: 24px 16px 60px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: "";
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 50%;
+    border: 6px solid #1a1a1a;
+    box-shadow: 0 0 0 4px white, 0 6px 18px rgba(0,0,0,0.25);
+  }
+
+  header::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 50px;
+    background: var(--red);
+    border-top: 6px solid #1a1a1a;
+    border-radius: 100px 100px 0 0 / 100px 100px 0 0;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    opacity: 0.92;
+    font-size: 0.95rem;
+  }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 14px 0 14px;
+  }
+
+  section {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    color: var(--red-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h2 .icon {
+    font-size: 1.3rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    margin-top: 14px;
+    color: var(--text);
+  }
+
+  p, li { color: var(--text-soft); }
+
+  /* CALCULATOR */
+  .calc-row {
+    margin-bottom: 14px;
+  }
+
+  .calc-row:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+
+  select, input[type="range"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--text);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8'><path fill='%23555' d='M1 1l6 6 6-6'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  input[type="range"] {
+    padding: 0;
+    height: 6px;
+    background: var(--border);
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--red);
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+
+  .slider-value {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .btn-group button {
+    flex: 1;
+    min-width: 70px;
+    padding: 10px 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--text);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-group button:hover {
+    border-color: var(--red);
+  }
+
+  .btn-group button.active {
+    background: var(--red);
+    color: white;
+    border-color: var(--red);
+    box-shadow: 0 2px 8px rgba(238,21,21,0.3);
+  }
+
+  .btn-group button.active.yellow {
+    background: var(--yellow);
+    color: #333;
+    border-color: var(--yellow-dark);
+    box-shadow: 0 2px 8px rgba(255,203,5,0.4);
+  }
+
+  /* RESULT */
+  .result {
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+    color: white;
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-top: 18px;
+    text-align: center;
+    box-shadow: var(--shadow-strong);
+  }
+
+  .result-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 4px;
+  }
+
+  .result-value {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+    transition: transform 0.2s;
+  }
+
+  .result-value.bump { transform: scale(1.08); }
+
+  .result-sub {
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  .progress {
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+    height: 14px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--yellow) 0%, #fff 100%);
+    border-radius: 999px;
+    transition: width 0.3s;
+  }
+
+  .multiplier-display {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    opacity: 0.85;
+  }
+
+  /* EQUALIZER */
+  .ref-bars {
+    margin-top: 12px;
+  }
+
+  .ref-bar {
+    margin-bottom: 12px;
+  }
+
+  .ref-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .ref-bar-track {
+    background: var(--border);
+    height: 22px;
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .ref-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .ref-bar-fill.poke { background: linear-gradient(90deg, #888 0%, #aaa 100%); }
+  .ref-bar-fill.great { background: linear-gradient(90deg, var(--blue) 0%, #5c6bc0 100%); }
+  .ref-bar-fill.ultra { background: linear-gradient(90deg, #2a2a2a 0%, var(--yellow-dark) 100%); }
+  .ref-bar-fill.your { background: linear-gradient(90deg, var(--red) 0%, var(--yellow) 100%); }
+
+  .verdict {
+    background: #fff5e6;
+    border-left: 4px solid var(--orange);
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-top: 14px;
+    font-size: 0.92rem;
+  }
+
+  .verdict.win {
+    background: #e8f5e9;
+    border-left-color: var(--green);
+  }
+
+  /* TABLE */
+  .scenarios {
+    display: grid;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .scenario {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: white;
+  }
+
+  .scenario-name {
+    font-weight: 700;
+    color: var(--red-dark);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .scenario-setup {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    margin-bottom: 8px;
+  }
+
+  .scenario-result {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .scenario-pct {
+    font-weight: 700;
+    color: var(--red);
+    font-size: 1.1rem;
+    min-width: 56px;
+  }
+
+  .scenario-bar {
+    flex: 1;
+    background: var(--border);
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .scenario-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red) 0%, var(--yellow) 100%);
+    border-radius: 999px;
+  }
+
+  /* POKEMON LIST */
+  .pokemon-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .poke-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    gap: 12px;
+  }
+
+  .poke-emoji {
+    font-size: 1.6rem;
+    width: 40px;
+    text-align: center;
+  }
+
+  .poke-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .poke-name {
+    font-weight: 700;
+    font-size: 0.98rem;
+  }
+
+  .poke-tier {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+
+  .poke-bcr {
+    background: var(--red);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .poke-bcr.easy { background: var(--green); }
+  .poke-bcr.medium { background: var(--orange); }
+  .poke-bcr.hard { background: var(--red); }
+  .poke-bcr.legendary { background: #5e35b1; }
+
+  /* INFO */
+  .formula-box {
+    background: #f7f7f7;
+    border: 1.5px dashed var(--border);
+    padding: 12px;
+    border-radius: 10px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    text-align: center;
+    margin: 10px 0;
+    overflow-x: auto;
+  }
+
+  .info-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .info-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.92rem;
+  }
+
+  .info-list li:last-child { border-bottom: none; }
+
+  .info-list .mult {
+    background: var(--yellow);
+    color: #333;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px 16px;
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+
+  footer a { color: var(--red-dark); }
+
+  /* RESPONSIVE */
+  @media (min-width: 600px) {
+    header h1 { font-size: 2rem; }
+    header p { font-size: 1.05rem; }
+    h2 { font-size: 1.35rem; }
+    .pokemon-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 900px) {
+    .scenarios { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* TIPS */
+  .tip-grid {
+    display: grid;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .tip {
+    background: #fffbe6;
+    border-left: 4px solid var(--yellow-dark);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  .tip strong { color: var(--red-dark); }
+
+  details {
+    margin-top: 10px;
+  }
+
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--red-dark);
+    padding: 8px 0;
+    user-select: none;
+  }
+
+  details[open] summary { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Kalkulator Łapania Pokémonów</h1>
+  <p>Sprawdź swoje szanse w Pokémon GO</p>
+</header>
+
+<main>
+
+  <!-- CALCULATOR -->
+  <section id="kalkulator">
+    <h2><span class="icon">🎯</span> Kalkulator szans</h2>
+
+    <div class="calc-row">
+      <label for="pokemon">Pokémon</label>
+      <select id="pokemon"></select>
+    </div>
+
+    <div class="calc-row">
+      <label for="level">Poziom Pokémona <span class="slider-value" id="levelValue">20</span></label>
+      <input type="range" id="level" min="1" max="35" value="20">
+      <div id="levelNote" style="font-size:0.82rem; color:var(--text-soft); margin-top:6px; display:none;">
+        ℹ️ Pokémony z raidów (w tym legendarki) są zawsze łapane na poziomie 20 - to stała narzucona przez Niantic. Suwak nieaktywny.
+      </div>
+    </div>
+
+    <div class="calc-row">
+      <label>Rodzaj Balla</label>
+      <div class="btn-group" id="ball">
+        <button data-val="1.0" class="active">⚪ Poké Ball</button>
+        <button data-val="1.5">🔵 Great Ball</button>
+        <button data-val="2.0">🟡 Ultra Ball</button>
+      </div>
+    </div>
+
+    <div class="calc-row">
+      <label>Jakość rzutu</label>
+      <div class="btn-group" id="throw">
+        <button data-val="1.0" class="active">Brak</button>
+        <button data-val="1.15">Nice</button>
+        <button data-val="1.5">Great</button>
+        <button data-val="1.85">Excellent</button>
+      </div>
+    </div>
+
+    <div class="calc-row">
+      <label>Curveball (zakręcony rzut)</label>
+      <div class="btn-group" id="curve">
+        <button data-val="1.0" class="active">Nie</button>
+        <button data-val="1.7" class="yellow">Tak (+70%)</button>
+      </div>
+    </div>
+
+    <div class="calc-row">
+      <label>Berry</label>
+      <div class="btn-group" id="berry">
+        <button data-val="1.0" class="active">Brak</button>
+        <button data-val="1.5">🍓 Razz</button>
+        <button data-val="1.8">🥝 Silver Pinap</button>
+        <button data-val="2.5">✨ Golden Razz</button>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Twoja szansa</div>
+      <div class="result-value" id="resultValue">—</div>
+      <div class="result-sub" id="resultSub">na złapanie w jednym rzucie</div>
+      <div class="progress"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="multiplier-display" id="multDisplay">Łączny mnożnik: 1.00x</div>
+    </div>
+
+    <details>
+      <summary>Co oznacza ten wynik?</summary>
+      <p style="font-size:0.88rem; margin-top:6px;">
+        To prawdopodobieństwo, że Pokémon pozostanie w ballu po jednym rzucie. Jeśli się "wyrwie", próbujesz dalej (chyba że ucieknie). Każdy rzut to niezależna szansa - jeśli pojedynczy rzut daje 30%, to 3 rzuty łącznie to ok. 66% szansy na złapanie zanim Pokémon ucieknie.
+      </p>
+    </details>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="jak-dziala">
+    <h2><span class="icon">📖</span> Jak to działa - w skrócie</h2>
+    <p>Każdy Pokémon ma <strong>Base Catch Rate (BCR)</strong> - od 2% (legendarki) do 50% (zwyklaki jak Pidgey). To fundament. Wszystko co robisz przy rzucie to <strong>mnożniki</strong>, które się ze sobą <em>mnożą</em> (nie dodają).</p>
+
+    <div class="formula-box">
+      Szansa = 1 - (1 - BCR / (2 · CPM))<sup>M</sup><br>
+      <span style="color:var(--text-soft); font-size:0.78rem;">M = Ball × Rzut × Curveball × Berry</span>
+    </div>
+
+    <h3>Mnożniki</h3>
+    <ul class="info-list">
+      <li><span>⚪ Poké Ball</span><span class="mult">1.0x</span></li>
+      <li><span>🔵 Great Ball</span><span class="mult">1.5x</span></li>
+      <li><span>🟡 Ultra Ball</span><span class="mult">2.0x</span></li>
+      <li><span>Nice throw</span><span class="mult">1.0 - 1.3x</span></li>
+      <li><span>Great throw</span><span class="mult">1.3 - 1.7x</span></li>
+      <li><span>Excellent throw</span><span class="mult">1.7 - 2.0x</span></li>
+      <li><span>Curveball</span><span class="mult">1.7x</span></li>
+      <li><span>🍓 Razz Berry</span><span class="mult">1.5x</span></li>
+      <li><span>🥝 Silver Pinap</span><span class="mult">1.8x</span></li>
+      <li><span>✨ Golden Razz</span><span class="mult">2.5x</span></li>
+    </ul>
+  </section>
+
+  <!-- EQUALIZER -->
+  <section id="equalizer">
+    <h2><span class="icon">⚖️</span> Magia Equalizera</h2>
+    <p>Sprawdź, kiedy zwykły Poké Ball <strong>dorównuje</strong> Great Ballowi i Ultra Ballowi.</p>
+
+    <h3>Włącz dodatki na Poké Ballu</h3>
+    <div class="btn-group" id="eqThrow" style="margin-bottom:8px;">
+      <button data-val="1.0" class="active">Brak</button>
+      <button data-val="1.15">+ Nice</button>
+      <button data-val="1.5">+ Great</button>
+      <button data-val="1.85">+ Excellent</button>
+    </div>
+    <div class="btn-group" id="eqCurve">
+      <button data-val="1.0" class="active">Bez Curve</button>
+      <button data-val="1.7" class="yellow">+ Curveball</button>
+    </div>
+
+    <div class="ref-bars">
+      <div class="ref-bar">
+        <div class="ref-bar-label"><span>⚪ Poké Ball + dodatki</span><span id="eqYourMult">1.00x</span></div>
+        <div class="ref-bar-track"><div class="ref-bar-fill your" id="eqYourBar" style="width:25%;">Twój</div></div>
+      </div>
+      <div class="ref-bar">
+        <div class="ref-bar-label"><span>🔵 Great Ball (bez dodatków)</span><span>1.50x</span></div>
+        <div class="ref-bar-track"><div class="ref-bar-fill great" style="width:37.5%;">Great</div></div>
+      </div>
+      <div class="ref-bar">
+        <div class="ref-bar-label"><span>🟡 Ultra Ball (bez dodatków)</span><span>2.00x</span></div>
+        <div class="ref-bar-track"><div class="ref-bar-fill ultra" style="width:50%;">Ultra</div></div>
+      </div>
+    </div>
+
+    <div class="verdict" id="eqVerdict">Twój Poké Ball bez dodatków jest słabszy od Great Balla. Dodaj coś!</div>
+
+    <details>
+      <summary>Najciekawsze odkrycia</summary>
+      <ul style="margin-top:8px; padding-left:20px; font-size:0.92rem; line-height:1.7;">
+        <li><strong>Sam Curveball (1.7x)</strong> czyni Poké Ball lepszym niż Great Ball.</li>
+        <li><strong>Nice + Curveball (≈1.96x)</strong> dorównuje Ultra Ballowi.</li>
+        <li><strong>Great throw + Curveball (2.55x)</strong> bije Ultra Balla.</li>
+        <li><strong>Excellent + Curveball (3.15x)</strong> = Poké Ball jest 1.6x lepszy niż goły Ultra Ball.</li>
+        <li>Wniosek: <strong>oszczędzaj Ultra Balle</strong>, naucz się Curveballa i Excellenta.</li>
+      </ul>
+    </details>
+  </section>
+
+  <!-- SCENARIOS -->
+  <section id="scenariusze">
+    <h2><span class="icon">🎬</span> Typowe scenariusze</h2>
+    <p>Przykład na Pokémonie o BCR = 20% (np. Eevee, Pikachu) na poziomie 20.</p>
+    <div class="scenarios" id="scenarios"></div>
+  </section>
+
+  <!-- POKEMON LIST -->
+  <section id="pokemony">
+    <h2><span class="icon">📋</span> Przykładowi Pokémoni - poziomy trudności</h2>
+    <p style="margin-bottom:12px;">Im niższy BCR, tym trudniej złapać. Wartości to przybliżone Base Catch Rate.</p>
+
+    <label style="margin-bottom:6px;">Sortuj według</label>
+    <div class="btn-group" id="sortMode" style="margin-bottom:12px;">
+      <button data-val="name" class="active">🔤 Alfabetycznie</button>
+      <button data-val="bcr-asc">🔥 Najtrudniejsze</button>
+      <button data-val="bcr-desc">🌱 Najłatwiejsze</button>
+    </div>
+
+    <div class="pokemon-grid" id="pokeGrid"></div>
+  </section>
+
+  <!-- TIPS -->
+  <section id="porady">
+    <h2><span class="icon">💡</span> Praktyczne porady</h2>
+    <div class="tip-grid">
+      <div class="tip"><strong>Curveball to darmowa moc.</strong> Zakręcaj zawsze - kosztuje 0, daje 1.7x. Najczęściej niedoceniany bonus.</div>
+      <div class="tip"><strong>Excellent ≈ Ultra Ball.</strong> Jak umiesz trafiać Excellent, oszczędzasz cenne Ultra Balle dla legendarek.</div>
+      <div class="tip"><strong>Golden Razz tylko na raidy.</strong> Na zwykłe Pokémony zwykła Razz wystarczy z naddatkiem.</div>
+      <div class="tip"><strong>Silver Pinap = combo.</strong> Daje 1.8x szansy + 2x candy. Idealny na Pokémony, których evo potrzebujesz.</div>
+      <div class="tip"><strong>Nanab Berry = spokój.</strong> Nie zwiększa szans, ale Pokémon mniej się rusza. Pomaga na uciekinierów (Abra, Wobbuffet).</div>
+      <div class="tip"><strong>Ultra + Golden Razz na zwyklaka to przesada.</strong> Marnujesz zasoby. Wystarczy Great Ball + Razz albo Curveball + Excellent na zwykłym ballu.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Wartości oparte na publicznie znanych mnożnikach Niantic. Faktyczne mnożniki rzutu (Nice/Great/Excellent) skalują się płynnie w zależności od rozmiaru okręgu - kalkulator używa wartości środkowych.
+</footer>
+
+<script>
+(function() {
+  // CPM table for levels 1-40 (Pokemon GO)
+  const CPM = {
+    1:0.094,2:0.16639787,3:0.21573247,4:0.25720806,5:0.29024988,
+    6:0.3210876,7:0.34921268,8:0.37523559,9:0.39956728,10:0.4225,
+    11:0.44310755,12:0.4627984,13:0.48168495,14:0.49985844,15:0.51739395,
+    16:0.5343543,17:0.5507927,18:0.5667545,19:0.5822789,20:0.5974,
+    21:0.6121573,22:0.6265671,23:0.64065295,24:0.65443563,25:0.667934,
+    26:0.6811649,27:0.69414365,28:0.7068842,29:0.7193991,30:0.7317,
+    31:0.7377695,32:0.7437894,33:0.74976087,34:0.7556855,35:0.76156384
+  };
+
+  // Pokemon list (BCR = Base Capture Rate, 0..1; raid=true => fixed level 20)
+  // Tier liczony z BCR + raid (patrz funkcja getTier nizej).
+  const RAW = [
+    ["Abra","🔮",0.40],["Aerodactyl","🦴",0.08],["Alakazam","🔮",0.08],
+    ["Arbok","🐍",0.16],["Arcanine","🔥",0.08],["Articuno","❄️",0.02,1],
+    ["Beedrill","🐝",0.16],["Bellsprout","🌿",0.40],["Blastoise","💧",0.08],
+    ["Bulbasaur","🌿",0.20],["Butterfree","🦋",0.16],["Caterpie","🐛",0.50],
+    ["Celebi","🌳",0.03,1],["Chansey","💗",0.08],["Charizard","🔥",0.08],
+    ["Charmander","🔥",0.20],["Charmeleon","🔥",0.16],["Chikorita","🌿",0.20],
+    ["Clefable","🧚",0.16],["Clefairy","🧚",0.40],["Cloyster","❄️",0.08],
+    ["Cubone","🦴",0.40],["Cyndaquil","🔥",0.20],["Dewgong","❄️",0.16],
+    ["Dialga","⚙️",0.02,1],["Diglett","🪨",0.40],["Ditto","⭐",0.16],
+    ["Dodrio","🐦",0.16],["Doduo","🐦",0.40],["Dragonair","🐲",0.16],
+    ["Dragonite (raid)","🐲",0.04,1],["Dratini","🐲",0.08],["Drowzee","🔮",0.40],
+    ["Dugtrio","🪨",0.16],["Eevee","🦊",0.20],["Ekans","🐍",0.40],
+    ["Electabuzz","⚡",0.20],["Electrode","⚡",0.16],["Espeon","🔮",0.08],
+    ["Exeggcute","🥚",0.40],["Exeggutor","🌿",0.08],["Farfetch'd","🦆",0.16],
+    ["Fearow","🐦",0.16],["Flareon","🔥",0.08],["Garchomp (raid)","🐲",0.04,1],
+    ["Gardevoir","🧚",0.08],["Gastly","👻",0.40],["Gengar","👻",0.08],
+    ["Geodude","🪨",0.40],["Giratina","👻",0.02,1],["Gloom","🌿",0.16],
+    ["Golbat","🦇",0.16],["Goldeen","🐟",0.40],["Golduck","💧",0.16],
+    ["Golem","🪨",0.08],["Graveler","🪨",0.16],["Grimer","🧪",0.40],
+    ["Groudon","🌋",0.02,1],["Growlithe","🔥",0.40],["Gyarados","🐉",0.08],
+    ["Haunter","👻",0.16],["Hitmonchan","👊",0.20],["Hitmonlee","👊",0.20],
+    ["Ho-Oh","🔥",0.03,1],["Horsea","🐎",0.40],["Hypno","🔮",0.16],
+    ["Ivysaur","🌿",0.16],["Jigglypuff","🧚",0.40],["Jolteon","⚡",0.08],
+    ["Jynx","❄️",0.20],["Kabuto","🦀",0.08],["Kabutops","🦀",0.08],
+    ["Kadabra","🔮",0.16],["Kakuna","🐛",0.50],["Kangaskhan","🐨",0.08],
+    ["Kingler","🦀",0.08],["Koffing","🧪",0.40],["Krabby","🦀",0.40],
+    ["Kyogre","🌊",0.02,1],["Lapras","🐉",0.08],["Larvitar","🦖",0.08],
+    ["Lickitung","👅",0.16],["Lucario","⚙️",0.08],["Lugia","🌊",0.02,1],
+    ["Machamp","👊",0.08],["Machoke","👊",0.16],["Machop","👊",0.40],
+    ["Magikarp","🐟",0.56],["Magmar","🔥",0.20],["Magnemite","⚡",0.40],
+    ["Magneton","⚡",0.16],["Mankey","👊",0.40],["Marowak","🦴",0.08],
+    ["Meowth","🐱",0.40],["Metagross (raid)","⚙️",0.04,1],["Metapod","🐛",0.50],
+    ["Mew","✨",0.03,1],["Mewtwo","👁️",0.03,1],["Mimikyu","👻",0.16],
+    ["Moltres","🔥",0.02,1],["Mr. Mime","🤡",0.20],["Muk","🧪",0.08],
+    ["Nidoking","🧪",0.08],["Nidoqueen","🧪",0.08],["Nidoran-F","🧪",0.40],
+    ["Nidoran-M","🧪",0.40],["Nidorina","🧪",0.16],["Nidorino","🧪",0.16],
+    ["Ninetales","🔥",0.08],["Oddish","🌿",0.40],["Omanyte","🐚",0.08],
+    ["Omastar","🐚",0.08],["Onix","🪨",0.08],["Palkia","🌊",0.02,1],
+    ["Paras","🍄",0.40],["Parasect","🍄",0.16],["Persian","🐱",0.16],
+    ["Pidgeot","🐦",0.08],["Pidgeotto","🐦",0.16],["Pidgey","🐦",0.50],
+    ["Pikachu","⚡",0.20],["Pinsir","🐛",0.20],["Poliwag","💧",0.40],
+    ["Poliwhirl","💧",0.16],["Poliwrath","💧",0.08],["Ponyta","🔥",0.40],
+    ["Porygon","🤖",0.08],["Primeape","👊",0.16],["Psyduck","🦆",0.40],
+    ["Pupitar","🦖",0.16],["Raichu","⚡",0.08],["Rapidash","🔥",0.08],
+    ["Raticate","🐭",0.16],["Rattata","🐭",0.50],["Rayquaza","💚",0.03,1],
+    ["Reshiram","🔥",0.03,1],["Rhydon","🪨",0.08],["Rhyhorn","🪨",0.40],
+    ["Riolu","👊",0.08],["Salamence (raid)","🐲",0.04,1],["Sandshrew","🪨",0.40],
+    ["Sandslash","🪨",0.16],["Scyther","🦗",0.20],["Seadra","🐎",0.16],
+    ["Seaking","🐟",0.16],["Seel","🦭",0.40],["Shellder","🐚",0.40],
+    ["Slowbro","💧",0.08],["Slowpoke","💧",0.40],["Snorlax","💤",0.08],
+    ["Spearow","🐦",0.50],["Squirtle","💧",0.20],["Starmie","💧",0.08],
+    ["Staryu","⭐",0.40],["Suicune","🌊",0.03,1],["Sylveon","🧚",0.08],
+    ["Tangela","🌿",0.40],["Tauros","🐂",0.20],["Tentacool","💧",0.40],
+    ["Tentacruel","💧",0.08],["Togepi","🧚",0.40],["Totodile","💧",0.20],
+    ["Tyranitar (raid)","🦖",0.04,1],["Umbreon","🌑",0.08],["Vaporeon","💧",0.08],
+    ["Venomoth","🦋",0.16],["Venonat","🐛",0.40],["Venusaur","🌿",0.08],
+    ["Victreebel","🌿",0.08],["Vileplume","🌿",0.08],["Voltorb","⚡",0.40],
+    ["Vulpix","🔥",0.40],["Wartortle","💧",0.16],["Weedle","🐛",0.50],
+    ["Weepinbell","🌿",0.16],["Weezing","🧪",0.08],["Wigglytuff","🧚",0.16],
+    ["Wobbuffet","🔮",0.16],["Xerneas","🦌",0.02,1],["Yveltal","🦅",0.02,1],
+    ["Zacian","🐺",0.02,1],["Zamazenta","🛡️",0.02,1],["Zapdos","⚡",0.02,1],
+    ["Zekrom","⚡",0.03,1],["Zubat","🦇",0.40]
+  ];
+
+  function getTier(bcr, raid) {
+    if (raid) return { name: "Legendarny / Raid", level: "legendary" };
+    if (bcr >= 0.30) return { name: "Bardzo łatwy", level: "easy" };
+    if (bcr >= 0.15) return { name: "Średni", level: "medium" };
+    if (bcr >= 0.05) return { name: "Trudny", level: "hard" };
+    return { name: "Bardzo trudny", level: "hard" };
+  }
+
+  const POKEMONS = RAW.map(([name, emoji, bcr, raid]) => {
+    const t = getTier(bcr, !!raid);
+    return { name, emoji, bcr, raid: !!raid, tier: t.name, level: t.level };
+  }).sort((a, b) => a.name.localeCompare(b.name, "pl"));
+
+  // Default CPM for raid bosses (level 20 effective)
+  const RAID_LEVEL = 20;
+
+  // ===== Build Pokemon select =====
+  const pokeSelect = document.getElementById("pokemon");
+  POKEMONS.forEach((p, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = `${p.emoji} ${p.name} (BCR ${(p.bcr*100).toFixed(0)}%)`;
+    pokeSelect.appendChild(opt);
+  });
+  const defaultIdx = Math.max(0, POKEMONS.findIndex(p => p.name === "Pikachu"));
+  pokeSelect.value = defaultIdx;
+
+  // ===== Build Pokemon grid =====
+  const grid = document.getElementById("pokeGrid");
+
+  function renderGrid(mode) {
+    let list = POKEMONS.slice();
+    if (mode === "bcr-asc") {
+      list.sort((a, b) => a.bcr - b.bcr || a.name.localeCompare(b.name, "pl"));
+    } else if (mode === "bcr-desc") {
+      list.sort((a, b) => b.bcr - a.bcr || a.name.localeCompare(b.name, "pl"));
+    } else {
+      list.sort((a, b) => a.name.localeCompare(b.name, "pl"));
+    }
+    grid.innerHTML = "";
+    list.forEach(p => {
+      const row = document.createElement("div");
+      row.className = "poke-row";
+      row.innerHTML = `
+        <div class="poke-emoji">${p.emoji}</div>
+        <div class="poke-info">
+          <div class="poke-name">${p.name}</div>
+          <div class="poke-tier">${p.tier}</div>
+        </div>
+        <div class="poke-bcr ${p.level}">${(p.bcr*100).toFixed(0)}%</div>
+      `;
+      grid.appendChild(row);
+    });
+  }
+
+  renderGrid("name");
+
+  setupGroup("sortMode", v => renderGrid(v), v => v);
+
+  // ===== Button group helper =====
+  function setupGroup(id, onChange, parser) {
+    const parse = parser || (v => parseFloat(v));
+    const group = document.getElementById(id);
+    let val = parse(group.querySelector(".active").dataset.val);
+    group.addEventListener("click", e => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      group.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      val = parse(btn.dataset.val);
+      onChange(val);
+    });
+    return () => val;
+  }
+
+  // ===== Catch rate computation =====
+  function computeCatchRate(bcr, level, ballMult, throwMult, curveMult, berryMult) {
+    const cpm = CPM[level] || CPM[20];
+    const M = ballMult * throwMult * curveMult * berryMult;
+    const base = 1 - bcr / (2 * cpm);
+    if (base <= 0) return { p: 1, M, base: 0 };
+    const p = 1 - Math.pow(base, M);
+    return { p, M, base };
+  }
+
+  // ===== Calculator state =====
+  const state = {
+    pokeIdx: defaultIdx,
+    level: 20,
+    ball: 1.0,
+    throw: 1.0,
+    curve: 1.0,
+    berry: 1.0,
+  };
+
+  function update() {
+    const poke = POKEMONS[state.pokeIdx];
+    const isRaid = poke.tier.toLowerCase().includes("raid") || poke.level === "legendary";
+    const lvl = isRaid ? RAID_LEVEL : state.level;
+
+    const slider = document.getElementById("level");
+    const note = document.getElementById("levelNote");
+    const lvlVal = document.getElementById("levelValue");
+    if (isRaid) {
+      slider.disabled = true;
+      slider.value = RAID_LEVEL;
+      slider.style.opacity = "0.4";
+      lvlVal.textContent = RAID_LEVEL + " (raid)";
+      note.style.display = "block";
+    } else {
+      slider.disabled = false;
+      slider.value = state.level;
+      slider.style.opacity = "1";
+      lvlVal.textContent = state.level;
+      note.style.display = "none";
+    }
+
+    const r = computeCatchRate(poke.bcr, lvl, state.ball, state.throw, state.curve, state.berry);
+    const pct = (r.p * 100);
+    const valEl = document.getElementById("resultValue");
+    valEl.textContent = pct.toFixed(1) + "%";
+    valEl.classList.add("bump");
+    setTimeout(() => valEl.classList.remove("bump"), 200);
+    document.getElementById("progressFill").style.width = pct + "%";
+    document.getElementById("multDisplay").textContent =
+      `Łączny mnożnik: ${r.M.toFixed(2)}x  •  BCR: ${(poke.bcr*100).toFixed(0)}%  •  Poziom: ${lvl}`;
+
+    // Sub-text
+    let sub = "na złapanie w jednym rzucie";
+    if (pct >= 90) sub = "praktycznie pewne 🎉";
+    else if (pct >= 70) sub = "bardzo wysokie";
+    else if (pct >= 40) sub = "całkiem niezłe";
+    else if (pct >= 20) sub = "umiarkowane";
+    else if (pct >= 10) sub = "niskie - przygotuj zapas balli";
+    else sub = "bardzo niskie - lepiej dorzuć Golden Razz";
+    document.getElementById("resultSub").textContent = sub;
+  }
+
+  // Connect inputs
+  pokeSelect.addEventListener("change", e => { state.pokeIdx = parseInt(e.target.value); update(); });
+  const levelInput = document.getElementById("level");
+  levelInput.addEventListener("input", e => {
+    state.level = parseInt(e.target.value);
+    document.getElementById("levelValue").textContent = state.level;
+    update();
+  });
+  setupGroup("ball",  v => { state.ball = v; update(); });
+  setupGroup("throw", v => { state.throw = v; update(); });
+  setupGroup("curve", v => { state.curve = v; update(); });
+  setupGroup("berry", v => { state.berry = v; update(); });
+
+  update();
+
+  // ===== Equalizer =====
+  const eq = { throw: 1.0, curve: 1.0 };
+  function updateEq() {
+    const m = eq.throw * eq.curve;
+    document.getElementById("eqYourMult").textContent = m.toFixed(2) + "x";
+    // Scale bars: max scale = 4.0 = 100%
+    const MAX = 4.0;
+    const yourPct = Math.min(100, (m / MAX) * 100);
+    document.getElementById("eqYourBar").style.width = yourPct + "%";
+
+    const v = document.getElementById("eqVerdict");
+    if (m >= 2.0) {
+      v.className = "verdict win";
+      v.innerHTML = `🎉 <strong>Twój Poké Ball (${m.toFixed(2)}x) bije Ultra Balla (2.0x)!</strong> Ultra Ball jest tu zbędny.`;
+    } else if (m >= 1.5) {
+      v.className = "verdict win";
+      v.innerHTML = `✅ <strong>Twój Poké Ball (${m.toFixed(2)}x) dorównuje lub bije Great Balla (1.5x).</strong> Do Ultra Balla brakuje jeszcze trochę.`;
+    } else if (m > 1.0) {
+      v.className = "verdict";
+      v.innerHTML = `⚠️ Twój Poké Ball (${m.toFixed(2)}x) jest lepszy niż goły, ale nadal słabszy od Great Balla (1.5x).`;
+    } else {
+      v.className = "verdict";
+      v.innerHTML = `Twój Poké Ball bez dodatków jest słabszy od Great Balla. Dodaj coś!`;
+    }
+  }
+  setupGroup("eqThrow", v => { eq.throw = v; updateEq(); });
+  setupGroup("eqCurve", v => { eq.curve = v; updateEq(); });
+  updateEq();
+
+  // ===== Scenarios =====
+  const SCENARIOS = [
+    { name: "😴 Leniwy gracz",       setup: "Poké Ball, zwykły rzut, brak curva, brak berry", mult: 1.0 },
+    { name: "🎯 Plus Curveball",      setup: "Poké Ball + Curveball",                           mult: 1.7 },
+    { name: "🎓 Casual",              setup: "Great Ball + Nice + Curveball",                   mult: 1.5 * 1.15 * 1.7 },
+    { name: "🏃 W biegu",             setup: "Great Ball + Razz",                               mult: 1.5 * 1.5 },
+    { name: "💪 Wprawiony gracz",     setup: "Poké Ball + Excellent + Curveball",               mult: 1.85 * 1.7 },
+    { name: "🔥 Tryhard",             setup: "Ultra Ball + Excellent + Curveball + Razz",       mult: 2.0 * 1.85 * 1.7 * 1.5 },
+    { name: "👑 Maksymalny",          setup: "Ultra Ball + Excellent + Curveball + Golden Razz", mult: 2.0 * 1.85 * 1.7 * 2.5 },
+    { name: "💀 Raid Boss",           setup: "Ultra Ball + Curveball + Golden Razz (BCR 3%)",   mult: 2.0 * 1.7 * 2.5, bcr: 0.03 },
+  ];
+  const scContainer = document.getElementById("scenarios");
+  // Reference: BCR 20%, level 20
+  SCENARIOS.forEach(s => {
+    const bcr = s.bcr || 0.20;
+    const cpm = CPM[20];
+    const base = 1 - bcr / (2 * cpm);
+    const p = base <= 0 ? 1 : 1 - Math.pow(base, s.mult);
+    const pct = (p * 100).toFixed(0);
+    const div = document.createElement("div");
+    div.className = "scenario";
+    div.innerHTML = `
+      <div class="scenario-name">${s.name}</div>
+      <div class="scenario-setup">${s.setup}</div>
+      <div class="scenario-result">
+        <div class="scenario-pct">${pct}%</div>
+        <div class="scenario-bar"><div class="scenario-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+    scContainer.appendChild(div);
+  });
+
+})();
+</script>
+
+</body>
+</html>
